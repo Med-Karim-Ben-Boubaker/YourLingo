@@ -7,3 +7,8 @@ export type ExerciseInput = {
     bankTokens: string[]
     solutionTokens: string[]
 }
+
+export type GeneratedLesson = {
+    title: string
+    exercises: ExerciseInput[]
+}
