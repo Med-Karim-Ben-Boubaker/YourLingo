@@ -41,7 +41,13 @@ yarn-error.log*
 next-env.d.ts
 
 # Specifications
-/specifications
+/specs
 
 # lock files
 package-lock.json
+
+/src/generated/prisma
+
+#database prisma related
+dev.db
+migrations/

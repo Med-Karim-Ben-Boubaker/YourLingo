@@ -1,0 +1,47 @@
+generator client {
+  provider   = "prisma-client-js"
+  output     = "../src/generated/prisma"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model ContentSource {
+  id         String @id @default(cuid())
+  promptText String
+
+  // Relations
+  lessons Lesson[]
+}
+
+model Lesson {
+  id              String @id @default(cuid())
+  title           String
+  contentSourceId String
+
+  // Relations
+  contentSource ContentSource @relation(fields: [contentSourceId], references: [id], onDelete: Cascade)
+  exercises     Exercise[]
+
+  @@index([contentSourceId])
+}
+
+model Exercise {
+  id             String @id @default(cuid())
+  lessonId       String
+  index          Int
+  type           String
+  mode           String
+  questionText   String
+  bankTokens     String
+  solutionTokens String
+
+  // Relations
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([lessonId, index])
+  @@index([lessonId])
+}
