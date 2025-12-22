@@ -59,3 +59,26 @@ export async function findLesson(lessonId: string): Promise<{ lessonId: string, 
         generatedLesson
     };
 }
+
+export async function getFullLesson(lessonId: string) {
+    const retrievedLesson = await findLessonWithExercises(lessonId);
+    if (!retrievedLesson) {
+        throw new Error("Lesson not found");
+    }
+    return {
+        lesson: {
+            id: retrievedLesson.id,
+            title: retrievedLesson.title,
+            contentSourceId: retrievedLesson.contentSourceId,
+        },
+        exercises: retrievedLesson.exercises.map((ex) => ({
+            id: ex.id,
+            index: ex.index,
+            type: ex.type,
+            mode: ex.mode,
+            questionText: ex.questionText,
+            bankTokens: ex.bankTokens,
+            solutionTokens: ex.solutionTokens,
+        })),
+    };
+}

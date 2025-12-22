@@ -51,3 +51,6 @@ package-lock.json
 #database prisma related
 dev.db
 migrations/
+
+# Cursor related files
+.cursor/

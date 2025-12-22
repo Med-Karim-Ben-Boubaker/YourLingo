@@ -12,3 +12,19 @@ export type GeneratedLesson = {
     title: string
     exercises: ExerciseInput[]
 }
+
+export type Exercise = {
+    id: string;
+    index: number;
+    type: string;
+    mode: string;
+    questionText: string;
+    bankTokens: string[] | string;
+    solutionTokens: string[] | string;
+};
+
+export type Lesson = {
+    id: string;
+    title: string;
+    exercises: Exercise[];
+};
