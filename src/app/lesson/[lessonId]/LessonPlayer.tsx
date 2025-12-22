@@ -19,6 +19,7 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
     const [usedTokenIndexes, setUsedTokenIndexes] = useState<Set<number>>(
         () => new Set()
     );
+    const [bankTokensOrder, setBankTokensOrder] = useState<string[]>([]);
     const [locked, setLocked] = useState(false);
     const [answers, setAnswers] = useState<Record<string, { isCorrect: boolean }>>(
         {}
@@ -38,22 +39,9 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
                 }
                 const payload: Lesson = await res.json();
                 if (cancelled) return;
+                // store exercises as received (token fields are comma-separated strings)
                 setLesson(payload);
-                // Normalize tokens (handle strings that are JSON)
-                const normalized = payload.exercises.map((ex) => {
-                    const bank =
-                        typeof ex.bankTokens === "string"
-                            ? tryParseJsonArray(ex.bankTokens)
-                            : ex.bankTokens;
-                    const solution =
-                        typeof ex.solutionTokens === "string"
-                            ? tryParseJsonArray(ex.solutionTokens)
-                            : ex.solutionTokens;
-                    return { ...ex, bankTokens: bank, solutionTokens: solution };
-                });
-                setExercises(
-                    normalized.sort((a, b) => a.index - b.index)
-                );
+                setExercises(payload.exercises.sort((a, b) => a.index - b.index));
             } catch (err) {
                 setError("Failed to load lesson.");
             } finally {
@@ -67,21 +55,35 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
     }, [lessonId]);
 
     useEffect(() => {
-        // reset per-exercise state when index changes
+        // reset per-exercise state when index changes and compute bank order once
         setCurrentAnswerTokens([]);
         setUsedTokenIndexes(new Set());
         setLocked(false);
-    }, [currentIndex]);
-
-    function tryParseJsonArray(value: string) {
-        try {
-            const parsed = JSON.parse(value);
-            if (Array.isArray(parsed)) return parsed;
-        } catch (e) {
-            // ignore
+        const ex = exercises[currentIndex];
+        if (ex) {
+            const solutionArray = parseTokens(String(ex.solutionTokens));
+            const distractorArray = parseTokens(String(ex.distractorTokens));
+            setBankTokensOrder(shuffleArray([...solutionArray, ...distractorArray]));
+        } else {
+            setBankTokensOrder([]);
         }
-        // fallback: split on spaces
-        return value.split(" ").filter(Boolean);
+    }, [currentIndex, exercises]);
+
+    function parseTokens(tokenString: string) {
+        const s = (tokenString ?? "").trim();
+        if (s.length === 0) return [];
+        return s.split(", ").map((t) => t.trim()).filter(Boolean);
+    }
+
+    function shuffleArray<T>(arr: T[]) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = a[i];
+            a[i] = a[j];
+            a[j] = tmp;
+        }
+        return a;
     }
 
     function selectToken(token: string, idx: number) {
@@ -104,9 +106,7 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
     function checkAnswer() {
         const ex = exercises[currentIndex];
         if (!ex) return;
-        const solution = Array.isArray(ex.solutionTokens)
-            ? ex.solutionTokens
-            : tryParseJsonArray(String(ex.solutionTokens));
+        const solution = parseTokens(String(ex.solutionTokens));
         const user = currentAnswerTokens;
         const isCorrect =
             user.length === solution.length &&
@@ -165,9 +165,7 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
     }
 
     const exercise = exercises[currentIndex];
-    const bankTokens: string[] = Array.isArray(exercise.bankTokens)
-        ? exercise.bankTokens
-        : tryParseJsonArray(String(exercise.bankTokens));
+    const bankTokens: string[] = bankTokensOrder;
 
     return (
         <main>
@@ -223,11 +221,7 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
                             ) : (
                                 <p style={{ color: "red" }}>
                                     Incorrect. Correct answer:{" "}
-                                    {Array.isArray(exercise.solutionTokens)
-                                        ? exercise.solutionTokens.join(" ")
-                                        : tryParseJsonArray(
-                                              String(exercise.solutionTokens)
-                                          ).join(" ")}
+                                    {parseTokens(String(exercise.solutionTokens)).join(" ")}
                                 </p>
                             )}
                         </div>

@@ -1,10 +1,10 @@
 import { prisma } from './prisma'
-import { ExerciseInput } from '../types/domain'
+import { Exercise } from '../types/domain'
 
 export async function createLessonWithExercises(
     promptText: string,
     title: string,
-    exercises: ExerciseInput[]
+    exercises: Exercise[]
 ): Promise<string> {
     try {
         const result = await prisma.$transaction(async (tx) => {
@@ -24,8 +24,8 @@ export async function createLessonWithExercises(
                     type: ex.type,
                     mode: ex.mode,
                     questionText: ex.questionText,
-                    bankTokens: JSON.stringify(ex.bankTokens),
-                    solutionTokens: JSON.stringify(ex.solutionTokens),
+                    solutionTokens: ex.solutionTokens,
+                    distractorTokens: ex.distractorTokens,
                 }))
             })
 
@@ -53,15 +53,10 @@ export async function findLessonWithExercises(lessonId: string) {
 
         if (!lesson) return null
 
-        const parsedExercises = lesson.exercises.map((ex) => ({
-            ...ex,
-            bankTokens: JSON.parse(ex.bankTokens) as string[],
-            solutionTokens: JSON.parse(ex.solutionTokens) as string[],
-        }))
-
+        // exercises already store token strings per schema; return as-is
         return {
             ...lesson,
-            exercises: parsedExercises,
+            exercises: lesson.exercises,
         }
     } catch (error) {
         console.error('Error finding lesson:', error)

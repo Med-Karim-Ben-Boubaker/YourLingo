@@ -1,27 +1,27 @@
 import { createLessonWithExercises, findLessonWithExercises } from '../lib/lessonRepository'
-import { ExerciseInput } from '../types/domain'
+import { Exercise } from '../types/domain'
 
 async function test() {
     console.log('--- Starting Database Test ---')
 
     const dummyPrompt = "I want to learn about ordering coffee in Berlin."
     const dummyTitle = "Coffee Shop Basics"
-    const dummyExercises: ExerciseInput[] = [
+    const dummyExercises: Exercise[] = [
         {
             index: 0,
             type: "reorder",
             mode: "translate",
             questionText: "A coffee, please.",
-            bankTokens: ["Ein", "Kaffee", "bitte"],
-            solutionTokens: ["Ein", "Kaffee", "bitte"]
+            solutionTokens: "Ein, Kaffee, bitte",
+            distractorTokens: ""
         },
         {
             index: 1,
             type: "reorder",
             mode: "translate",
             questionText: "I would like a tea.",
-            bankTokens: ["Ich", "hätte", "gerne", "einen", "Tee"],
-            solutionTokens: ["Ich", "hätte", "gerne", "einen", "Tee"]
+            solutionTokens: "Ich, hätte, gerne, einen, Tee",
+            distractorTokens: ""
         }
     ]
 
@@ -41,13 +41,13 @@ async function test() {
                 console.error('❌ Error: Number of exercises mismatch.')
             }
 
-            // check first exercise
+            // check first exercise token storage (strings per spec)
             const firstEx = retrievedLesson.exercises[0]
-            console.log('First exercise bank tokens:', firstEx.bankTokens)
-            if (Array.isArray(firstEx.bankTokens)) {
-                console.log('✅ Success! bankTokens is an array.')
+            console.log('First exercise solutionTokens:', firstEx.solutionTokens)
+            if (typeof firstEx.solutionTokens === 'string') {
+                console.log('✅ Success! solutionTokens is a string.')
             } else {
-                console.error('❌ Error: bankTokens is NOT an array.')
+                console.error('❌ Error: solutionTokens is NOT a string.')
             }
         } else {
             console.error('❌ Error: Could not find lesson with ID:', lessonId)

@@ -19,7 +19,7 @@ async function test() {
 
         const firstEx = gl.exercises[0];
         const unexpectedKeys = Object.keys(firstEx).filter(k =>
-            !['index', 'type', 'mode', 'questionText', 'bankTokens', 'solutionTokens'].includes(k)
+            !['index', 'type', 'mode', 'questionText', 'solutionTokens', 'distractorTokens'].includes(k)
         );
 
         if (unexpectedKeys.length > 0) {

@@ -1,32 +1,32 @@
-import { GeneratedLesson, ExerciseInput } from "../types/domain";
+import { Lesson, Exercise } from "../types/domain";
 
 interface ContentGeneratorService {
-    generateExercises(promptText: string): Promise<GeneratedLesson>;
+    generateExercises(promptText: string): Promise<Lesson>;
 }
 
 export class ContentGenerator implements ContentGeneratorService {
-    generateExercises(promptText: string): Promise<GeneratedLesson> {
+    generateExercises(promptText: string): Promise<Lesson> {
 
-        const exercises: ExerciseInput[] = [
+        const exercises: Exercise[] = [
             {
                 index: 0,
                 type: "reorder",
                 mode: "translate",
                 questionText: "A coffee, please.",
-                bankTokens: ["Ein", "Kaffee", "bitte"],
-                solutionTokens: ["Ein", "Kaffee", "bitte"]
+                solutionTokens: "Ein, Kaffee, bitte",
+                distractorTokens: ""
             },
             {
                 index: 1,
                 type: "reorder",
                 mode: "translate",
                 questionText: "I would like a tea.",
-                bankTokens: ["Ich", "hätte", "gerne", "einen", "Tee"],
-                solutionTokens: ["Ich", "hätte", "gerne", "einen", "Tee"]
+                solutionTokens: "Ich, hätte, gerne, einen, Tee",
+                distractorTokens: ""
             }
         ];
 
-        const generatedLesson: GeneratedLesson = {
+        const generatedLesson: Lesson = {
             title: "Lesson Title",
             exercises: exercises
         }

@@ -1,4 +1,4 @@
-import { GeneratedLesson } from "../types/domain";
+import { Lesson } from "../types/domain";
 import { ContentGenerator } from "./contentGenerator";
 import { createLessonWithExercises, findLessonWithExercises } from "./lessonRepository";
 
@@ -11,7 +11,7 @@ async function validatePrompt(userPrompt: string): Promise<boolean> {
     return true;
 }
 
-export async function createLesson(userPrompt: string): Promise<{ lessonId: string, generatedLesson: GeneratedLesson }> {
+export async function createLesson(userPrompt: string): Promise<{ lessonId: string, generatedLesson: Lesson }> {
 
     const title = "Lesson Title";
 
@@ -20,7 +20,7 @@ export async function createLesson(userPrompt: string): Promise<{ lessonId: stri
     }
 
     const contentGenerator = new ContentGenerator();
-    const generatedLesson: GeneratedLesson = await contentGenerator.generateExercises(userPrompt);
+    const generatedLesson: Lesson = await contentGenerator.generateExercises(userPrompt);
 
     const lessonId = await createLessonWithExercises(
         userPrompt,
@@ -34,7 +34,7 @@ export async function createLesson(userPrompt: string): Promise<{ lessonId: stri
     };
 }
 
-export async function findLesson(lessonId: string): Promise<{ lessonId: string, generatedLesson: GeneratedLesson }> {
+export async function findLesson(lessonId: string): Promise<{ lessonId: string, generatedLesson: Lesson }> {
 
     const retrievedLesson = await findLessonWithExercises(lessonId);
 
@@ -42,15 +42,15 @@ export async function findLesson(lessonId: string): Promise<{ lessonId: string, 
         throw new Error("Lesson not found");
     }
 
-    const generatedLesson: GeneratedLesson = {
+    const generatedLesson: Lesson = {
         title: retrievedLesson.title,
         exercises: retrievedLesson.exercises.map(ex => ({
             index: ex.index,
             type: ex.type,
             mode: ex.mode,
             questionText: ex.questionText,
-            bankTokens: ex.bankTokens,
-            solutionTokens: ex.solutionTokens
+            solutionTokens: ex.solutionTokens,
+            distractorTokens: ex.distractorTokens
         }))
     };
 
@@ -77,8 +77,8 @@ export async function getFullLesson(lessonId: string) {
             type: ex.type,
             mode: ex.mode,
             questionText: ex.questionText,
-            bankTokens: ex.bankTokens,
             solutionTokens: ex.solutionTokens,
+            distractorTokens: ex.distractorTokens,
         })),
     };
 }

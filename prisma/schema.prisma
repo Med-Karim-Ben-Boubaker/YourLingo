@@ -29,14 +29,14 @@ model Lesson {
 }
 
 model Exercise {
-  id             String @id @default(cuid())
-  lessonId       String
-  index          Int
-  type           String
-  mode           String
-  questionText   String
-  bankTokens     String
-  solutionTokens String
+  id               String @id @default(cuid())
+  lessonId         String
+  index            Int
+  type             String
+  mode             String
+  questionText     String
+  solutionTokens   String
+  distractorTokens String
 
   // Relations
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
