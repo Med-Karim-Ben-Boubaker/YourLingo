@@ -1,9 +1,7 @@
 import { findLesson, getFullLesson } from "../../../../../lib/lessonActions";
 
-export async function GET(request: Request, { params }: { params?: { lessonId?: string } } = {}) {
-    // Unwrap params if it's a Promise (Next.js may pass a Promise here)
-    const paramObj = params && typeof (params as any).then === "function" ? await params : params;
-    const lessonId = paramObj?.lessonId;
+export async function GET(request: Request, { params }: { params: Promise<{ lessonId: string }> }) {
+    const { lessonId } = await params;
 
     if (!lessonId) {
         return new Response(JSON.stringify({ message: "Missing lessonId parameter" }), {
