@@ -1,7 +1,7 @@
 import { useReducer, useEffect } from "react";
-import { Exercise } from "../../../../../types/domain";
-import { parseTokens } from "../../../../../lib/utils/tokenParser";
-import { shuffleArray } from "../../../../../lib/utils/arrayUtils";
+import { Exercise } from "../../../../types/domain";
+import { parseTokens } from "../../../../lib/utils/tokenParser";
+import { shuffleArray } from "../../../../lib/utils/arrayUtils";
 
 interface GameState {
     currentIndex: number;

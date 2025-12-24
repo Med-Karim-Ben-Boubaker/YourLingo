@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Lesson, Exercise } from "../../../../../types/domain";
+import { Lesson, Exercise } from "../../../../types/domain";
 
 export function useLesson(lessonId: string) {
     const [isLoading, setIsLoading] = useState(true);

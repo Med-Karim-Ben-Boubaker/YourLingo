@@ -54,3 +54,5 @@ migrations/
 
 # Cursor related files
 .cursor/
+
+context

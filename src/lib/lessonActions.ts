@@ -1,22 +1,12 @@
 import { Lesson } from "../types/domain";
 import { ContentGenerator } from "./contentGenerator";
 import { createLessonWithExercises, findLessonWithExercises } from "./lessonRepository";
+import { getPromptValidationError } from "./validators/promptValidator";
 
-const MAX_PROMPT_LENGTH = 5000;
-
-async function validatePrompt(userPrompt: string): Promise<boolean> {
-    if (userPrompt.length > MAX_PROMPT_LENGTH) {
-        return false;
-    }
-    return true;
-}
-
-export async function createLesson(userPrompt: string): Promise<{ lessonId: string, generatedLesson: Lesson }> {
-
-    const title = "Lesson Title";
-
-    if (!validatePrompt(userPrompt)) {
-        throw new Error("Prompt is too long");
+export async function createLesson(userPrompt: string): Promise<{ lessonId: string; generatedLesson: Lesson }> {
+    const validationError = getPromptValidationError(userPrompt);
+    if (validationError) {
+        throw new Error(validationError);
     }
 
     const contentGenerator = new ContentGenerator();
@@ -24,38 +14,12 @@ export async function createLesson(userPrompt: string): Promise<{ lessonId: stri
 
     const lessonId = await createLessonWithExercises(
         userPrompt,
-        title,
+        generatedLesson.title,
         generatedLesson.exercises
     );
 
     return {
         lessonId,
-        generatedLesson
-    };
-}
-
-export async function findLesson(lessonId: string): Promise<{ lessonId: string, generatedLesson: Lesson }> {
-
-    const retrievedLesson = await findLessonWithExercises(lessonId);
-
-    if (!retrievedLesson) {
-        throw new Error("Lesson not found");
-    }
-
-    const generatedLesson: Lesson = {
-        title: retrievedLesson.title,
-        exercises: retrievedLesson.exercises.map(ex => ({
-            index: ex.index,
-            type: ex.type,
-            mode: ex.mode,
-            questionText: ex.questionText,
-            solutionTokens: ex.solutionTokens,
-            distractorTokens: ex.distractorTokens
-        }))
-    };
-
-    return {
-        lessonId: retrievedLesson.id,
         generatedLesson
     };
 }

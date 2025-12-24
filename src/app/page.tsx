@@ -1,13 +1,13 @@
-import PromptForm from "./components/PromptForm";
+import Link from "next/link";
 
 export default function RootPage() {
     return (
         <main>
-            <header>
-                <h1>Welcome to YourLingo</h1>
-            </header>
-            <p>What do you want to learn about?</p>
-            <PromptForm />
+            <h1>Welcome to YourLingo</h1>
+            <p>Create personalized language lessons</p>
+            <Link href="/prompt-form">
+                <button>Create a lesson</button>
+            </Link>
         </main>
     );
 }

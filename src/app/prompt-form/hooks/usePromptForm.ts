@@ -1,29 +1,49 @@
-"use client";
-
-import React, { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-export default function PromptForm() {
+interface UsePromptFormReturn {
+    promptText: string;
+    setPromptText: (text: string) => void;
+    isLoading: boolean;
+    error: string | null;
+    handleSubmit: (e: React.FormEvent) => void;
+}
+
+export function usePromptForm(): UsePromptFormReturn {
     const [promptText, setPromptText] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const abortControllerRef = useRef<AbortController | null>(null);
 
-    async function handleSubmit(e: React.FormEvent) {
+    useEffect(() => {
+        return () => {
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+        };
+    }, []);
 
+    const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
-        if (promptText.trim().length < 10) {
+
+        const trimmedPrompt = promptText.trim();
+        if (trimmedPrompt.length < 10) {
             setError("Please enter at least 10 characters.");
             return;
         }
+
         setIsLoading(true);
-            try {
-                
+        const abortController = new AbortController();
+        abortControllerRef.current = abortController;
+
+        try {
             const res = await fetch("/api/lessons", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userPrompt: promptText }),
+                body: JSON.stringify({ userPrompt: trimmedPrompt }),
+                signal: abortController.signal
             });
 
             if (res.status === 201) {
@@ -31,7 +51,6 @@ export default function PromptForm() {
                 const lessonId = body?.lessonId;
                 if (lessonId) {
                     router.push(`/lesson/${lessonId}`);
-                    return;
                 } else {
                     setError("Unexpected response from server.");
                 }
@@ -40,39 +59,12 @@ export default function PromptForm() {
             } else {
                 setError("Server error. Please try again later.");
             }
-        } catch (err) {
+        } catch (_err) {
             setError("Network error. Please try again.");
         } finally {
             setIsLoading(false);
         }
-    }
+    }, [promptText, router]);
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label htmlFor="prompt">Prompt</label>
-                <br />
-                <textarea
-                    id="prompt"
-                    value={promptText}
-                    onChange={(e) => setPromptText(e.target.value)}
-                    rows={6}
-                    cols={60}
-                    placeholder="E.g. I want to learn a cafe conversation including: kaffee, tschuss, bitte, ich mochte"
-                />
-            </div>
-            <div>
-                <button type="submit" disabled={isLoading}>
-                    {isLoading ? "Creating..." : "Create lesson"}
-                </button>
-            </div>
-            {error && (
-                <div role="alert" aria-live="assertive">
-                    {error}
-                </div>
-            )}
-        </form>
-    );
+    return { promptText, setPromptText, isLoading, error, handleSubmit };
 }
-
-

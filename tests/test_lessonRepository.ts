@@ -1,9 +1,7 @@
-import { createLessonWithExercises, findLessonWithExercises } from '../lib/lessonRepository'
-import { Exercise } from '../types/domain'
+import { createLessonWithExercises, findLessonWithExercises } from '../src/lib/lessonRepository'
+import { Exercise } from '../src/types/domain'
 
 async function test() {
-    console.log('--- Starting Database Test ---')
-
     const dummyPrompt = "I want to learn about ordering coffee in Berlin."
     const dummyTitle = "Coffee Shop Basics"
     const dummyExercises: Exercise[] = [
@@ -27,34 +25,23 @@ async function test() {
 
     try {
         const lessonId = await createLessonWithExercises(dummyPrompt, dummyTitle, dummyExercises)
-        console.log('✅ Success! Created lesson with ID:', lessonId)
-
         const retrievedLesson = await findLessonWithExercises(lessonId)
 
-        if (retrievedLesson) {
-            console.log('✅ Success! Found lesson:', retrievedLesson.title)
-            console.log('Number of exercises found:', retrievedLesson.exercises.length)
-
-            if (retrievedLesson.exercises.length === dummyExercises.length) {
-                console.log('✅ Success! Number of exercises match.')
-            } else {
-                console.error('❌ Error: Number of exercises mismatch.')
-            }
-
-            // check first exercise token storage (strings per spec)
-            const firstEx = retrievedLesson.exercises[0]
-            console.log('First exercise solutionTokens:', firstEx.solutionTokens)
-            if (typeof firstEx.solutionTokens === 'string') {
-                console.log('✅ Success! solutionTokens is a string.')
-            } else {
-                console.error('❌ Error: solutionTokens is NOT a string.')
-            }
-        } else {
-            console.error('❌ Error: Could not find lesson with ID:', lessonId)
+        if (!retrievedLesson) {
+            throw new Error('Could not find lesson with ID: ' + lessonId);
         }
 
+        if (retrievedLesson.exercises.length !== dummyExercises.length) {
+            throw new Error('Number of exercises mismatch.');
+        }
+
+        const firstEx = retrievedLesson.exercises[0]
+        if (typeof firstEx.solutionTokens !== 'string') {
+            throw new Error('solutionTokens is NOT a string.');
+        }
     } catch (err) {
-        console.error('❌ Test failed:', err)
+        console.error('❌ Test failed:', err);
+        process.exit(1);
     }
 }
 

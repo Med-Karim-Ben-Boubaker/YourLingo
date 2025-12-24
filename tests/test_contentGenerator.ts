@@ -1,12 +1,12 @@
-import { ContentGenerator } from "../lib/contentGenerator";
+import { ContentGenerator } from "../src/lib/contentGenerator";
 
 async function test() {
-    console.log('--- Starting Content Generator Test ---')
-
     const contentGenerator = new ContentGenerator()
-    const exercises = await contentGenerator.generateExercises('bla bla text')
+    const result = await contentGenerator.generateExercises('test prompt')
 
-    console.log('Exercises generated:', exercises)
+    if (!result || !result.exercises || result.exercises.length === 0) {
+        throw new Error('ContentGenerator failed to generate exercises');
+    }
 }
 
 test()

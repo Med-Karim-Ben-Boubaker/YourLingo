@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { parseTokens } from "../../../../../lib/utils/tokenParser";
+import { parseTokens } from "../../../../lib/utils/tokenParser";
 
 interface FeedbackMessageProps {
     exerciseId: string;
