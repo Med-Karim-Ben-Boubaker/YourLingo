@@ -36,7 +36,7 @@ export class LLMContentGenerator implements ContentGeneratorService {
     }
 
     private buildSystemPrompt(params: GenerationParams): string {
-        return `You are a German language learning content generator. Generate JSON ONLY - no markdown, no code fences, no extra commentary.
+        return `You are a ${params.targetLanguage} language learning content generator. Generate JSON ONLY - no markdown, no code fences, no extra commentary.
 
 Generate a lesson with the following constraints:
 - title: max ${generatorConfig.titleMaxLength} characters, relevant to the topic
@@ -50,7 +50,7 @@ Generate a lesson with the following constraints:
 
 Content should be learner-friendly and appropriate for ${params.difficultyLevel} level.
 Each exercise should be a practical, realistic language learning scenario.
-shuffle between generating translation from english to german and german to english.
+shuffle between generating translations from ${params.sourceLanguage} to ${params.targetLanguage} and from ${params.targetLanguage} to ${params.sourceLanguage}.
 
 Return JSON with this exact structure (no extra fields):
 {
@@ -63,6 +63,8 @@ Return JSON with this exact structure (no extra fields):
       "questionText": "Question text here",
       "solutionTokens": "token1, token2, token3",
       "distractorTokens": "maybe, extra"
+      , "sourceLanguage": "${params.sourceLanguage}"
+      , "targetLanguage": "${params.targetLanguage}"
     }
   ]
 }`;

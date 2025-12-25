@@ -16,6 +16,8 @@ export class StubContentGenerator implements ContentGeneratorService {
             questionText: `Stub exercise ${i + 1} for prompt: "${promptText.substring(0, 50)}..."`,
             solutionTokens: joinTokens([`word${i}_1`, `word${i}_2`, `word${i}_3`]),
             distractorTokens: "",
+            sourceLanguage: params.sourceLanguage,
+            targetLanguage: params.targetLanguage,
         }));
 
         const generatedLesson: Lesson = {

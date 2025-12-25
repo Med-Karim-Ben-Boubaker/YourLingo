@@ -21,7 +21,7 @@ async function test() {
 
         const firstEx = getFullLessonResult.exercises[0];
         const unexpectedKeys = Object.keys(firstEx).filter(k =>
-            !['id', 'index', 'type', 'mode', 'questionText', 'solutionTokens', 'distractorTokens'].includes(k)
+            !['id', 'index', 'type', 'mode', 'questionText', 'solutionTokens', 'distractorTokens', 'sourceLanguage', 'targetLanguage'].includes(k)
         );
 
         if (unexpectedKeys.length > 0) {

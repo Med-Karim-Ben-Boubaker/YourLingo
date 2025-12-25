@@ -16,6 +16,8 @@ const ExerciseSchema = z.object({
     questionText: z.string().min(1, "questionText cannot be empty"),
     solutionTokens: z.string().min(1, "solutionTokens must contain at least one token"),
     distractorTokens: z.string().optional().default(""),
+    sourceLanguage: z.string().optional(),
+    targetLanguage: z.string().optional(),
 });
 
 const LessonSchema = z.object({
@@ -98,6 +100,8 @@ export function sanitizeExercise(
         questionText: (exercise.questionText || "").trim(),
         solutionTokens: solution,
         distractorTokens: distractors,
+        sourceLanguage: String(exercise.sourceLanguage || ""),
+        targetLanguage: String(exercise.targetLanguage || ""),
     };
 }
 

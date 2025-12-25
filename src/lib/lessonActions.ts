@@ -10,6 +10,8 @@ const DEFAULTS = {
     maxExercises: 10,
     allowedExerciseTypes: ["reorder"],
     allowedModes: ["translate"],
+    sourceLanguage: "en",
+    targetLanguage: "de",
 };
 
 export async function createLesson(request: CreateLessonRequest): Promise<{
@@ -28,6 +30,8 @@ export async function createLesson(request: CreateLessonRequest): Promise<{
         maxExercises: request.maxExercises ?? DEFAULTS.maxExercises,
         allowedExerciseTypes: request.allowedExerciseTypes ?? DEFAULTS.allowedExerciseTypes,
         allowedModes: request.allowedModes ?? DEFAULTS.allowedModes,
+        sourceLanguage: request.sourceLanguage ?? DEFAULTS.sourceLanguage,
+        targetLanguage: request.targetLanguage ?? DEFAULTS.targetLanguage,
     };
 
     const contentGenerator = createContentGenerator();
@@ -97,6 +101,8 @@ export async function getFullLesson(lessonId: string) {
             questionText: ex.questionText,
             solutionTokens: ex.solutionTokens,
             distractorTokens: ex.distractorTokens,
+            sourceLanguage: ex.sourceLanguage,
+            targetLanguage: ex.targetLanguage,
         })),
     };
 }

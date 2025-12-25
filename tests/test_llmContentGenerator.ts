@@ -19,6 +19,8 @@ async function test() {
             maxExercises: 8,
             allowedExerciseTypes: ["reorder"],
             allowedModes: ["translate"],
+            sourceLanguage: "en",
+            targetLanguage: "de",
         };
 
         const systemPrompt = (generator as unknown as { buildSystemPrompt: (params: unknown) => string }).buildSystemPrompt(testParams);
@@ -58,6 +60,8 @@ async function test() {
             maxExercises: 10,
             allowedExerciseTypes: ["reorder"],
             allowedModes: ["translate"],
+            sourceLanguage: "en",
+            targetLanguage: "de",
         });
 
         const constraints = [
@@ -181,6 +185,8 @@ async function test() {
                 maxExercises: 3,
                 allowedExerciseTypes: ["reorder"],
                 allowedModes: ["translate"],
+                sourceLanguage: "en",
+                targetLanguage: "de",
             };
 
             console.log("  Calling Gemini API (this may take a few seconds)...");

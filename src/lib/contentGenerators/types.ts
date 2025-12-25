@@ -10,4 +10,6 @@ export interface GenerationParams {
     maxExercises: number;
     allowedExerciseTypes: string[];
     allowedModes: string[];
+    sourceLanguage: string;
+    targetLanguage: string;
 }

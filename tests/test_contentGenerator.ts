@@ -8,6 +8,8 @@ async function test() {
         maxExercises: 10,
         allowedExerciseTypes: ["reorder"],
         allowedModes: ["translate"],
+        sourceLanguage: "en",
+        targetLanguage: "de",
     });
 
     if (!result || !result.exercises || result.exercises.length === 0) {

@@ -6,6 +6,8 @@ export type Exercise = {
     questionText: string;
     solutionTokens: string;
     distractorTokens: string;
+    sourceLanguage?: string;
+    targetLanguage?: string;
 };
 
 export type Lesson = {
@@ -25,6 +27,8 @@ export type CreateLessonRequest = {
     maxExercises?: number;
     allowedExerciseTypes?: string[];
     allowedModes?: string[];
+    sourceLanguage?: string;
+    targetLanguage?: string;
 };
 
 export type CreateLessonResponse = { lessonId: string; title: string; aiFallbackUsed?: boolean };
