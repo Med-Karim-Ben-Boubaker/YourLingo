@@ -11,8 +11,17 @@ import { AnswerArea } from "./components/AnswerArea";
 import { LessonSummary } from "./components/LessonSummary";
 
 export default function LessonPlayer({ lessonId }: { lessonId: string }) {
-    const { lesson, exercises, isLoading, error, notFound } = useLesson(lessonId);
 
+    // use Lesson Hook to fetch data
+    const {
+        lesson,
+        exercises,
+        isLoading,
+        error,
+        notFound
+    } = useLesson(lessonId);
+
+    // use Lesson Game Hook to manage game state
     const {
         currentIndex,
         currentAnswerTokens,

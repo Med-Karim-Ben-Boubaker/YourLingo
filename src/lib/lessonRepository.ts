@@ -39,7 +39,7 @@ export async function createLessonWithExercises(
     }
 }
 
-export async function findLessonWithExercises(lessonId: string): Promise<{ id: string; title: string; contentSourceId: string; exercises: any[] } | null> {
+export async function findLessonWithExercises(lessonId: string): Promise<{ id: string; title: string; contentSourceId: string; exercises: Exercise[] } | null> {
     try {
 
         const lesson = await prisma.lesson.findUnique({

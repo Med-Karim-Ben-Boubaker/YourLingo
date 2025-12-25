@@ -29,7 +29,7 @@ export function useLesson(lessonId: string) {
                 const payload: Lesson = await res.json();
                 setLesson(payload);
                 setExercises(payload.exercises.sort((a: Exercise, b: Exercise) => a.index - b.index));
-            } catch (_err) {
+            } catch {
                 if (abortController.signal.aborted) return;
                 setError("Failed to load lesson.");
             } finally {

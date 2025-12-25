@@ -1,8 +1,18 @@
 import { createLesson, getFullLesson } from "../src/lib/lessonActions";
+import type { CreateLessonRequest } from "../src/types/domain";
 
 async function test() {
     try {
-        const createResult = await createLesson("This is a test prompt");
+        const request: CreateLessonRequest = {
+            promptText: "This is a test prompt",
+            difficultyLevel: "A1",
+            minExercises: 1,
+            maxExercises: 10,
+            allowedExerciseTypes: ["reorder"],
+            allowedModes: ["translate"],
+        };
+
+        const createResult = await createLesson(request);
         const getFullLessonResult = await getFullLesson(createResult.lessonId);
 
         if (getFullLessonResult.lesson.id !== createResult.lessonId) {

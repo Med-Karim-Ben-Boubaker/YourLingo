@@ -1,12 +1,18 @@
-import { ContentGenerator } from "../src/lib/contentGenerator";
+import { StubContentGenerator } from "../src/lib/contentGenerators/stubContentGenerator";
 
 async function test() {
-    const contentGenerator = new ContentGenerator()
-    const result = await contentGenerator.generateExercises('test prompt')
+    const contentGenerator = new StubContentGenerator();
+    const result = await contentGenerator.generateExercises("test prompt", {
+        difficultyLevel: "A1",
+        minExercises: 1,
+        maxExercises: 10,
+        allowedExerciseTypes: ["reorder"],
+        allowedModes: ["translate"],
+    });
 
     if (!result || !result.exercises || result.exercises.length === 0) {
-        throw new Error('ContentGenerator failed to generate exercises');
+        throw new Error("StubContentGenerator failed to generate exercises");
     }
 }
 
-test()
+test();

@@ -1,27 +1,81 @@
-import { Lesson } from "../types/domain";
-import { ContentGenerator } from "./contentGenerator";
+import { Lesson, CreateLessonRequest } from "../types/domain";
+import { createContentGenerator } from "./contentGenerators/contentGeneratorFactory";
 import { createLessonWithExercises, findLessonWithExercises } from "./lessonRepository";
-import { getPromptValidationError } from "./validators/promptValidator";
+import { validateLessonRequest } from "./validators/lessonRequestValidator";
+import { validateLesson, sanitizeLesson } from "./validators/lessonValidator";
+import { generatorConfig } from "./config/generatorConfig";
 
-export async function createLesson(userPrompt: string): Promise<{ lessonId: string; generatedLesson: Lesson }> {
-    const validationError = getPromptValidationError(userPrompt);
+const DEFAULTS = {
+    minExercises: 1,
+    maxExercises: 10,
+    allowedExerciseTypes: ["reorder"],
+    allowedModes: ["translate"],
+};
+
+export async function createLesson(request: CreateLessonRequest): Promise<{
+    lessonId: string;
+    generatedLesson: Lesson;
+    aiFallbackUsed: boolean;
+}> {
+    const validationError = validateLessonRequest(request);
     if (validationError) {
         throw new Error(validationError);
     }
 
-    const contentGenerator = new ContentGenerator();
-    const generatedLesson: Lesson = await contentGenerator.generateExercises(userPrompt);
+    const params = {
+        difficultyLevel: request.difficultyLevel,
+        minExercises: request.minExercises ?? DEFAULTS.minExercises,
+        maxExercises: request.maxExercises ?? DEFAULTS.maxExercises,
+        allowedExerciseTypes: request.allowedExerciseTypes ?? DEFAULTS.allowedExerciseTypes,
+        allowedModes: request.allowedModes ?? DEFAULTS.allowedModes,
+    };
 
-    const lessonId = await createLessonWithExercises(
-        userPrompt,
-        generatedLesson.title,
-        generatedLesson.exercises
+    const contentGenerator = createContentGenerator();
+    let aiFallbackUsed = false;
+    let generatedLesson: Lesson;
+
+    try {
+        generatedLesson = await contentGenerator.generateExercises(request.promptText, params);
+    } catch (error) {
+        if (isAIFailure(error) && !generatorConfig.strictMode) {
+            console.error("AI generation failed, falling back to stub generator:", error);
+            const { StubContentGenerator } = await import("./contentGenerators/stubContentGenerator");
+            const stubGenerator = new StubContentGenerator();
+            generatedLesson = await stubGenerator.generateExercises(request.promptText, params);
+            aiFallbackUsed = true;
+        } else {
+            throw error;
+        }
+    }
+
+    const sanitizedLesson = sanitizeLesson(
+        generatedLesson,
+        params.allowedExerciseTypes,
+        params.allowedModes
     );
 
-    return {
-        lessonId,
-        generatedLesson
-    };
+    const validationError2 = validateLesson(sanitizedLesson);
+    if (!validationError2.isValid) {
+        throw new Error(`Generated lesson validation failed: ${validationError2.error}`);
+    }
+
+    const lessonId = await createLessonWithExercises(
+        request.promptText,
+        sanitizedLesson.title,
+        sanitizedLesson.exercises
+    );
+
+    return { lessonId, generatedLesson: sanitizedLesson, aiFallbackUsed };
+}
+
+function isAIFailure(error: unknown): boolean {
+    if (error instanceof Error) {
+        return error.message.includes("AI_PROVIDER_ERROR") ||
+               error.message.includes("AI_TIMEOUT_ERROR") ||
+               error.message.includes("AI generation failed") ||
+               error.message.includes("Failed to parse AI response");
+    }
+    return false;
 }
 
 export async function getFullLesson(lessonId: string) {
