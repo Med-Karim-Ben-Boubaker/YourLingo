@@ -1,4 +1,5 @@
 import { FeedbackMessage } from "./FeedbackMessage";
+import ListenButton from "./ListenButton";
 
 interface AnswerAreaProps {
     answerTokens: string[];
@@ -11,6 +12,7 @@ interface AnswerAreaProps {
     onClear: () => void;
     onCheckAnswer: () => void;
     onNext: () => void;
+    answerLang?: string;
 }
 
 export function AnswerArea({
@@ -24,10 +26,12 @@ export function AnswerArea({
     onClear,
     onCheckAnswer,
     onNext
+    , answerLang
 }: AnswerAreaProps) {
+    const answerText = answerTokens.join(" ");
     return (
         <div>
-            <p>Answer: {answerTokens.join(" ")}</p>
+            <p>Answer: {answerText}</p>
             <div>
                 <button onClick={onClear} disabled={locked}>
                     Clear
@@ -38,6 +42,9 @@ export function AnswerArea({
                 >
                     Check
                 </button>
+                {answerTokens.length > 0 && (
+                    <ListenButton text={answerText} lang={answerLang} />
+                )}
                 <button onClick={onNext} disabled={!locked}>
                     {currentIndex + 1 >= totalExercises ? "Finish" : "Next"}
                 </button>

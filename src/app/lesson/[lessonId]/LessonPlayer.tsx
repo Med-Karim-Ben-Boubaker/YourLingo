@@ -99,6 +99,7 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
                     answers={answers}
                     currentIndex={currentIndex}
                     totalExercises={exercises.length}
+                    answerLang={exercise.targetLanguage || lesson?.exercises?.[0]?.targetLanguage || "en"}
                     onClear={clearCurrent}
                     onCheckAnswer={() => checkAnswer(exercise)}
                     onNext={goNext}
