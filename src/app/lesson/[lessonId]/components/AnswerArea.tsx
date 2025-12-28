@@ -55,6 +55,7 @@ export function AnswerArea({
                         exerciseId={exerciseId}
                         exerciseSolution={exerciseSolution}
                         answers={answers}
+                        lang={answerLang}
                     />
                 </div>
             )}
