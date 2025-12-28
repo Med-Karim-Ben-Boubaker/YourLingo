@@ -49,8 +49,8 @@ export function usePromptForm(): UsePromptFormReturn {
                 body: JSON.stringify({
                     promptText: trimmedPrompt,
                     difficultyLevel,
-                    minExercises: 1,
-                    maxExercises: 10,
+                    minExercises: 10,
+                    maxExercises: 20,
                     allowedExerciseTypes: ["reorder"],
                     allowedModes: ["translate"],
                 }),

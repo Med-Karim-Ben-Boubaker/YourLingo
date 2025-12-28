@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { parseTokens } from "../../../../lib/utils/tokenParser";
 import ListenButton from "./ListenButton";
 
@@ -23,54 +23,39 @@ export function FeedbackMessage({ exerciseId, exerciseSolution, answers, lang, q
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // fetch explanation only when the answer is incorrect
-    useEffect(() => {
-        let cancelled = false;
-        async function fetchExplanation() {
-            if (isCorrect !== false) return;
-            // avoid re-fetching if we already have an explanation
-            if (explanation || loading) return;
-            setLoading(true);
-            setError(null);
-            try {
-                if (!questionText || !userAnswer) {
-                    // missing context to request explanation
-                    setLoading(false);
-                    return;
-                }
-                const res = await fetch("/api/lessons/explain-correction", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        questionText,
-                        userAnswer,
-                        correctAnswer,
-                        sourceLanguage,
-                        targetLanguage: lang
-                    }),
-                });
-                // If server returns non-JSON or error, fall back to not showing explanation
-                if (!res.ok) {
-                    const text = await res.text();
-                    if (!cancelled) setError(`Explanation unavailable: ${res.status}`);
-                    setLoading(false);
-                    return;
-                }
-                const data = await res.json();
-                if (!cancelled) setExplanation(String(data.explanation || ""));
-            } catch (err: unknown) {
-                if (!cancelled) setError("Explanation unavailable");
-            } finally {
-                if (!cancelled) setLoading(false);
-            }
+    async function handleExplainClick() {
+        if (loading) return;
+        if (!questionText || !userAnswer) {
+            setError("Missing context to explain.");
+            return;
         }
-
-        fetchExplanation();
-        return () => {
-            cancelled = true;
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isCorrect, exerciseId]);
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch("/api/lessons/explain-correction", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    questionText,
+                    userAnswer,
+                    correctAnswer,
+                    sourceLanguage,
+                    targetLanguage: lang
+                }),
+            });
+            if (!res.ok) {
+                setError(`Explanation unavailable: ${res.status}`);
+                setLoading(false);
+                return;
+            }
+            const data = await res.json();
+            setExplanation(String(data.explanation || ""));
+        } catch (err: unknown) {
+            setError("Explanation unavailable");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     if (isCorrect) {
         return (
@@ -89,8 +74,14 @@ export function FeedbackMessage({ exerciseId, exerciseSolution, answers, lang, q
             </p>
             {loading && <p>Loading explanation...</p>}
             {error && <p style={{ color: "gray" }}>{error}</p>}
+            {!loading && !explanation && (
+                <button onClick={handleExplainClick}>Explain why</button>
+            )}
             {!loading && explanation && (
-                <p style={{ color: "#333" }}>{explanation}</p>
+                <>
+                    <p style={{ color: "#333" }}>{explanation}</p>
+                    <button onClick={() => setExplanation(null)}>Hide explanation</button>
+                </>
             )}
         </div>
     );
