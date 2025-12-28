@@ -35,6 +35,62 @@ export class LLMContentGenerator implements ContentGeneratorService {
         }
     }
 
+    async generateCorrectionExplanation(
+        questionText: string,
+        userAnswer: string,
+        correctAnswer: string,
+        params: GenerationParams
+    ): Promise<{ correctAnswer: string; explanation: string }> {
+        const systemPrompt = `You are a concise language teacher. Return JSON ONLY with two fields: "correctAnswer" (the corrected target-language sentence) and "explanation" (1-3 short sentences in English). Focus the explanation on the German side: describe the German grammatical or lexical issue that makes the user's answer incorrect or non-idiomatic. Write the explanation in clear English, do not include translations of the whole sentence, examples, or extra fields. Keep the explanation minimal and focused on German grammar or word choice.`;
+
+        const userPrompt = `Question: "${questionText}"
+UserAnswer: "${userAnswer}"
+CorrectAnswer: "${correctAnswer}"
+TargetLanguage: "${params.targetLanguage}"
+
+Provide the corrected sentence (use the CorrectAnswer if it is the best phrasing) and a very short English explanation (1-3 sentences) that explains the problem from the German side—what in the German sentence/wording is incorrect or misleading and why.`;
+
+        try {
+            const result = await generateText({
+                model: google(generatorConfig.model),
+                prompt: userPrompt,
+                system: systemPrompt,
+                temperature: 0.2,
+            });
+
+            let cleaned = result.text.trim();
+            const fenceMatch = cleaned.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
+            if (fenceMatch) {
+                cleaned = fenceMatch[1];
+            }
+
+            try {
+                const parsed = JSON.parse(cleaned);
+                return {
+                    correctAnswer: String(parsed.correctAnswer ?? correctAnswer),
+                    explanation: String(parsed.explanation ?? ""),
+                };
+            } catch {
+                // Attempt to recover if the model returned a short two-line text: first line corrected sentence, rest explanation
+                const lines = cleaned.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+                if (lines.length >= 1) {
+                    const first = lines[0].replace(/^["']|["']$/g, "");
+                    const rest = lines.slice(1).join(" ");
+                    return {
+                        correctAnswer: first || correctAnswer,
+                        explanation: rest || "",
+                    };
+                }
+                throw new Error("Failed to parse AI response");
+            }
+        } catch (error) {
+            if (this.isAIFailure(error)) {
+                throw error;
+            }
+            throw new Error(`AI_PROVIDER_ERROR: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
     private buildSystemPrompt(params: GenerationParams): string {
         return `You are a ${params.targetLanguage} language learning content generator. Generate JSON ONLY - no markdown, no code fences, no extra commentary.
 

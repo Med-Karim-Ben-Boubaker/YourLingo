@@ -27,4 +27,14 @@ export class StubContentGenerator implements ContentGeneratorService {
 
         return Promise.resolve(generatedLesson);
     }
+
+    generateCorrectionExplanation(
+        questionText: string,
+        userAnswer: string,
+        correctAnswer: string,
+        params: GenerationParams
+    ): Promise<{ correctAnswer: string; explanation: string }> {
+        const explanation = `The correct phrasing is "${correctAnswer}". The user's answer uses a different structure or word choice and is not the most natural translation in this context.`;
+        return Promise.resolve({ correctAnswer, explanation });
+    }
 }
