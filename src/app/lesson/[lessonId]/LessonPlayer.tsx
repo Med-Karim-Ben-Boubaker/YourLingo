@@ -96,10 +96,12 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
                     locked={locked}
                     exerciseId={exerciseId}
                     exerciseSolution={exercise.solutionTokens}
+                    questionText={exercise.questionText}
                     answers={answers}
                     currentIndex={currentIndex}
                     totalExercises={exercises.length}
                     answerLang={exercise.targetLanguage || lesson?.exercises?.[0]?.targetLanguage || "en"}
+                    sourceLang={exercise.sourceLanguage}
                     onClear={clearCurrent}
                     onCheckAnswer={() => checkAnswer(exercise)}
                     onNext={goNext}

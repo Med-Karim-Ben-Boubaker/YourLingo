@@ -6,6 +6,7 @@ interface AnswerAreaProps {
     locked: boolean;
     exerciseId: string;
     exerciseSolution: string;
+    questionText?: string;
     answers: Record<string, { isCorrect: boolean }>;
     currentIndex: number;
     totalExercises: number;
@@ -13,6 +14,7 @@ interface AnswerAreaProps {
     onCheckAnswer: () => void;
     onNext: () => void;
     answerLang?: string;
+    sourceLang?: string;
 }
 
 export function AnswerArea({
@@ -27,6 +29,7 @@ export function AnswerArea({
     onCheckAnswer,
     onNext
     , answerLang
+    , questionText, sourceLang
 }: AnswerAreaProps) {
     const answerText = answerTokens.join(" ");
     return (
@@ -56,6 +59,9 @@ export function AnswerArea({
                         exerciseSolution={exerciseSolution}
                         answers={answers}
                         lang={answerLang}
+                        questionText={questionText}
+                        userAnswer={answerText}
+                        sourceLanguage={sourceLang}
                     />
                 </div>
             )}
