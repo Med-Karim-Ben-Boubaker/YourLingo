@@ -24,6 +24,10 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
     // use Lesson Game Hook to manage game state
     const {
         currentIndex,
+        playQueuePosition,
+        playQueueLength,
+        isCorrectionPhase,
+        correctionInitialTotal,
         currentAnswerTokens,
         usedTokenIndexes,
         bankTokensOrder,
@@ -83,7 +87,13 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
                 <h1>{lesson.title}</h1>
             </header>
             <section>
-                <ExerciseProgress current={currentIndex} total={exercises.length} />
+                <ExerciseProgress
+                    current={currentIndex}
+                    total={exercises.length}
+                    isCorrectionPhase={isCorrectionPhase}
+                    correctionPosition={playQueuePosition}
+                    correctionTotal={correctionInitialTotal ?? playQueueLength}
+                />
                 <QuestionDisplay questionText={exercise.questionText} lang={exercise.sourceLanguage} />
                 <TokenBank
                     tokens={bankTokensOrder}
