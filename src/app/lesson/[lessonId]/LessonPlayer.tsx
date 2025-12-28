@@ -84,7 +84,7 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
             </header>
             <section>
                 <ExerciseProgress current={currentIndex} total={exercises.length} />
-                <QuestionDisplay questionText={exercise.questionText} />
+                <QuestionDisplay questionText={exercise.questionText} lang={exercise.sourceLanguage} />
                 <TokenBank
                     tokens={bankTokensOrder}
                     usedTokenIndexes={usedTokenIndexes}

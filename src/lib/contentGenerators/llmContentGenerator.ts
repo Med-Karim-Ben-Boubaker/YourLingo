@@ -71,7 +71,6 @@ Return JSON with this exact structure (no extra fields):
     }
 
     private parseAIResponse(text: string): Lesson {
-        // Strip markdown code fences if present (model sometimes ignores "no code fences" instruction)
         let cleanedText = text.trim();
         const codeFenceMatch = cleanedText.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
         if (codeFenceMatch) {

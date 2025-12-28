@@ -1,18 +1,9 @@
-import { Lesson, CreateLessonRequest } from "../types/domain";
+import { Lesson, CreateLessonRequest, DEFAULT_GENERATION_PARAMS } from "../types/domain";
 import { createContentGenerator } from "./contentGenerators/contentGeneratorFactory";
 import { createLessonWithExercises, findLessonWithExercises } from "./lessonRepository";
 import { validateLessonRequest } from "./validators/lessonRequestValidator";
 import { validateLesson, sanitizeLesson } from "./validators/lessonValidator";
 import { generatorConfig } from "./config/generatorConfig";
-
-const DEFAULTS = {
-    minExercises: 1,
-    maxExercises: 10,
-    allowedExerciseTypes: ["reorder"],
-    allowedModes: ["translate"],
-    sourceLanguage: "en",
-    targetLanguage: "de",
-};
 
 export async function createLesson(request: CreateLessonRequest): Promise<{
     lessonId: string;
@@ -26,12 +17,12 @@ export async function createLesson(request: CreateLessonRequest): Promise<{
 
     const params = {
         difficultyLevel: request.difficultyLevel,
-        minExercises: request.minExercises ?? DEFAULTS.minExercises,
-        maxExercises: request.maxExercises ?? DEFAULTS.maxExercises,
-        allowedExerciseTypes: request.allowedExerciseTypes ?? DEFAULTS.allowedExerciseTypes,
-        allowedModes: request.allowedModes ?? DEFAULTS.allowedModes,
-        sourceLanguage: request.sourceLanguage ?? DEFAULTS.sourceLanguage,
-        targetLanguage: request.targetLanguage ?? DEFAULTS.targetLanguage,
+        minExercises: request.minExercises ?? DEFAULT_GENERATION_PARAMS.minExercises,
+        maxExercises: request.maxExercises ?? DEFAULT_GENERATION_PARAMS.maxExercises,
+        allowedExerciseTypes: request.allowedExerciseTypes ?? DEFAULT_GENERATION_PARAMS.allowedExerciseTypes,
+        allowedModes: request.allowedModes ?? DEFAULT_GENERATION_PARAMS.allowedModes,
+        sourceLanguage: request.sourceLanguage ?? DEFAULT_GENERATION_PARAMS.sourceLanguage,
+        targetLanguage: request.targetLanguage ?? DEFAULT_GENERATION_PARAMS.targetLanguage,
     };
 
     const contentGenerator = createContentGenerator();

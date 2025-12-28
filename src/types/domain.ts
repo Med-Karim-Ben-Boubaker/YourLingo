@@ -20,6 +20,15 @@ export type DifficultyLevel = "A1" | "A2" | "B1" | "B2";
 
 export const DIFFICULTY_LEVELS = ["A1", "A2", "B1", "B2"] as const;
 
+export const DEFAULT_GENERATION_PARAMS = {
+    minExercises: 1,
+    maxExercises: 10,
+    allowedExerciseTypes: ["reorder"],
+    allowedModes: ["translate"],
+    sourceLanguage: "en",
+    targetLanguage: "de",
+};
+
 export type CreateLessonRequest = {
     promptText: string;
     difficultyLevel: DifficultyLevel;
